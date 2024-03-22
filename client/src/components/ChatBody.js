@@ -30,8 +30,12 @@ const ChatBody = ({ messages, typingStatus, lastMessageRef }) => {
           ) : (
             <div className="message__chats" key={message.id}>
               <p>{message.name}</p>
-              {message.predictions && message.predictions.len !== 0 && (
-                <p style={{ color: "red", fontWeight: 600, fontStyle: 'italic' }}>This message has been identified by our AI systems as potentially containing: {message.predictions.map(p => p.label).join(", ")}</p>
+              {(message.predictions && message.predictions.length !== 0) && (
+                <p style={{ color: "red", fontWeight: 600, fontStyle: 'italic' }}>
+                  This message has been identified by our AI systems as potentially containing: {
+                    message.predictions.map(p => p.label.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")).join(", ")
+                  }
+                </p>
               )}
               <div className='message__recipient'>
                 <p>{message.text}</p>
