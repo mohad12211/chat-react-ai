@@ -1,4 +1,6 @@
 const express = require("express")
+require('@tensorflow/tfjs-node');
+const toxicity = require('@tensorflow-models/toxicity');
 const app = express()
 const cors = require("cors")
 const http = require('http').Server(app);
@@ -16,23 +18,28 @@ const messagesData = JSON.parse(rawData);
 app.use(cors())
 app.use(express.static('build'))
 let users = []
+let model = null;
+toxicity.load(0.6).then(m => {
+    model = m;
+    console.log("Toxicity Model Loaded");
+});
+
 
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`)
 
-    socket.on("message", data => {
-        /** 
-        Uncomment to save the messages to the message.json file 
-        */
-
-        messagesData["messages"].push(data)
+    socket.on("message", async (data) => {
+        let predictions = (await model.classify(data.text)).filter(p => p.results[0].match).map(p => ({ label: p.label, match: p.results[0].match }));
+        let classifiedData = { ...data, predictions };
+        console.log(classifiedData);
+        messagesData["messages"].push(classifiedData)
         const stringData = JSON.stringify(messagesData, null, 2)
         fs.writeFile("messages.json", stringData, (err) => {
             if (err) {
                 console.error(err);
             }
         })
-        socketIO.emit("messageResponse", data)
+        socketIO.emit("messageResponse", classifiedData)
     })
 
     socket.on("typing", data => {
@@ -58,6 +65,6 @@ app.get('/api', (req, res) => {
 });
 
 
-http.listen(PORT, () => {
+http.listen(PORT, async () => {
     console.log(`Server listening on ${PORT}`);
 });
