@@ -3,9 +3,10 @@ const app = express()
 const cors = require("cors")
 const http = require('http').Server(app);
 const PORT = 4000
+const url = process.env.NODE_ENV === 'production' ? "http://typological.me:4000" : "http://localhost:4000"
 const socketIO = require('socket.io')(http, {
     cors: {
-        origin: "http://localhost:3000"
+        origin: url
     }
 });
 const fs = require('fs');

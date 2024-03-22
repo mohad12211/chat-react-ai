@@ -3,6 +3,7 @@ import ChatBar from './ChatBar'
 import ChatBody from './ChatBody'
 import ChatFooter from './ChatFooter'
 
+const url = process.env.NODE_ENV === 'production' ? "http://typological.me:4000" : "http://localhost:4000"
 
 const ChatPage = ({ socket }) => {
   const [messages, setMessages] = useState([])
@@ -18,7 +19,7 @@ const ChatPage = ({ socket }) => {
   */
   useEffect(() => {
     function fetchMessages() {
-      fetch("http://localhost:4000/api")
+      fetch(url)
         .then(response => response.json())
         .then(data => setMessages(data.messages))
     }

@@ -3,7 +3,9 @@ import Home from "./components/Home"
 import ChatPage from "./components/ChatPage";
 import socketIO from "socket.io-client"
 
-const socket = socketIO.connect("http://localhost:4000")
+const url = process.env.NODE_ENV === 'production' ? "http://typological.me:4000" : "http://localhost:4000"
+
+const socket = socketIO.connect(url)
 function App() {
   return (
     <BrowserRouter>

@@ -1,3 +1,5 @@
+const url = process.env.NODE_ENV === 'production' ? "http://typological.me:4000" : "http://localhost:4000"
+
 function sendNotification(message, user) {
   document.onvisibilitychange = () => {
     if (document.hidden) {
@@ -6,7 +8,7 @@ function sendNotification(message, user) {
         body: `@${user}: ${message}`
       })
       notification.onclick = () => function() {
-        window.open("http://localhost:3000/chat")
+        window.open(url)
       }
     }
   }
