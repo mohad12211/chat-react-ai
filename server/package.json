@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js --ignore messages.json"
+    "start": "nodemon index.js --ignore messages.json",
+    "build": "cd ../client && npm run build && cp -r build/ ../server"
   },
   "keywords": [],
   "author": "",
