@@ -13,6 +13,7 @@ const rawData = fs.readFileSync('messages.json');
 const messagesData = JSON.parse(rawData);
 
 app.use(cors())
+app.use(express.static('build'))
 let users = []
 
 socketIO.on('connection', (socket) => {
