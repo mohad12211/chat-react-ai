@@ -14,24 +14,20 @@ const ChatPage = ({ socket }) => {
     socket.on("messageResponse", data => setMessages([...messages, data]))
   }, [socket, messages])
 
-  /** 
-    Uncomment to Fetch the messages from the API route
-  */
-  // useEffect(() => {
-  //   function fetchMessages() {
-  //     fetch(url)
-  //       .then(response => response.json())
-  //       .then(data => setMessages(data.messages))
-  //   }
-  //   fetchMessages()
-  // }, [])
+  useEffect(() => {
+    function fetchMessages() {
+      fetch(url)
+        .then(response => response.json())
+        .then(data => setMessages(data.messages))
+    }
+    fetchMessages()
+  }, [])
 
   useEffect(() => {
     socket.on("typingResponse", data => setTypingStatus(data))
   }, [socket])
 
   useEffect(() => {
-    // 👇️ scroll to bottom every time messages change
     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 

@@ -31,7 +31,6 @@ socketIO.on('connection', (socket) => {
     socket.on("message", async (data) => {
         let predictions = (await model.classify(data.text)).filter(p => p.results[0].match).map(p => ({ label: p.label, match: p.results[0].match }));
         let classifiedData = { ...data, predictions };
-        console.log(classifiedData);
         messagesData["messages"].push(classifiedData)
         const stringData = JSON.stringify(messagesData, null, 2)
         fs.writeFile("messages.json", stringData, (err) => {
@@ -65,6 +64,6 @@ app.get('/api', (req, res) => {
 });
 
 
-http.listen(PORT, async () => {
+http.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
 });
