@@ -3,7 +3,7 @@ import ChatBar from './ChatBar'
 import ChatBody from './ChatBody'
 import ChatFooter from './ChatFooter'
 
-const url = process.env.NODE_ENV === 'production' ? "http://typological.me:4000" : "http://localhost:4000"
+const url = process.env.NODE_ENV === 'production' ? "http://typological.me:4000/api" : "http://localhost:4000/api"
 
 const ChatPage = ({ socket }) => {
   const [messages, setMessages] = useState([])
