@@ -1,4 +1,4 @@
-const url = process.env.NODE_ENV === 'production' ? "http://typological.me:4000" : "http://localhost:4000"
+const url = process.env.NODE_ENV === 'production' ? "https://typological.me" : "http://localhost:4000"
 
 function sendNotification(message, user) {
   document.onvisibilitychange = () => {
