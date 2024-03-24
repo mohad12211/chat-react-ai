@@ -1,5 +1,8 @@
 import React from 'react'
 import { useNavigate } from "react-router-dom"
+import defaultImg from "../assets/user.png"
+
+const url = process.env.NODE_ENV === 'production' ? "https://typological.me/" : "http://localhost:4000/";
 
 const ChatBody = ({ messages, typingStatus, lastMessageRef }) => {
   const navigate = useNavigate()
@@ -21,9 +24,11 @@ const ChatBody = ({ messages, typingStatus, lastMessageRef }) => {
       <div className='message__container'>
         {messages.map(message => (
           message.name === localStorage.getItem("userName") ? (
+
             <div className="message__chats" key={message.id}>
               <p className='sender__name'>You</p>
               <div className='message__sender'>
+                <img className='sender__pfp' src={`${url}${message.userId}`} alt="profile" onError={e => e.currentTarget.src = defaultImg} />
                 <p>{message.text}</p>
               </div>
             </div>
@@ -38,7 +43,7 @@ const ChatBody = ({ messages, typingStatus, lastMessageRef }) => {
                 </p>
               )}
               <div className='message__recipient'>
-                <p>{message.text}</p>
+                <p><img className='recipient__pfp' src={`${url}${message.userId}`} alt="profile" onError={e => e.currentTarget.src = defaultImg} />{message.text}</p>
               </div>
             </div>
           )

@@ -1,4 +1,16 @@
 const express = require("express")
+const multer = require('multer')
+const storage = multer.diskStorage({
+    destination: function(_, _, cb) {
+        cb(null, './pfp/')
+    },
+    filename: function(_, file, cb) {
+        cb(null, file.fieldname)
+    }
+})
+
+const upload = multer({ storage: storage })
+
 require('@tensorflow/tfjs-node');
 const toxicity = require('@tensorflow-models/toxicity');
 const app = express()
@@ -17,6 +29,7 @@ const messagesData = JSON.parse(rawData);
 
 app.use(cors())
 app.use(express.static('build'))
+app.use(express.static('pfp'))
 let users = []
 let model = null;
 toxicity.load(0.6).then(m => {
@@ -30,7 +43,7 @@ socketIO.on('connection', (socket) => {
 
     socket.on("message", async (data) => {
         let predictions = (await model.classify(data.text)).filter(p => p.results[0].match).map(p => ({ label: p.label, match: p.results[0].match }));
-        let classifiedData = { ...data, predictions };
+        let classifiedData = { ...data, predictions, userId: socket.id };
         messagesData["messages"].push(classifiedData)
         const stringData = JSON.stringify(messagesData, null, 2)
         fs.writeFile("messages.json", stringData, (err) => {
@@ -59,8 +72,12 @@ socketIO.on('connection', (socket) => {
     });
 });
 
-app.get('/api', (req, res) => {
+app.get('/api', (_, res) => {
     res.json(messagesData);
+});
+
+app.post('/profile', upload.any(), (_, res) => {
+    res.status(200).send();
 });
 
 

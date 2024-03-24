@@ -147,6 +147,22 @@ font-size: 15px;
 .sender__name {
   text-align: right;
 }
+.sender__pfp {
+  float: right;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  margin-top: -5px;
+}
+.recipient__pfp {
+  position: relative;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  top: 10px;
+  left: -5px;
+  margin-top: -100px;
+}
 .message__status {
   position: fixed;
   bottom: 50px;
