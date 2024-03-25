@@ -8,37 +8,37 @@ const storage = multer.diskStorage({
         cb(null, file.fieldname)
     }
 })
-
 const upload = multer({ storage: storage })
 
 require('@tensorflow/tfjs-node');
-const toxicity = require('@tensorflow-models/toxicity');
-const app = express()
-const cors = require("cors")
-const http = require('http').Server(app);
-const PORT = 4000
-const url = process.env.NODE_ENV === 'production' ? "https://typological.me" : "http://localhost:3000"
-const socketIO = require('socket.io')(http, {
-    cors: {
-        origin: url
-    }
-});
-const fs = require('fs');
-const rawData = fs.readFileSync('messages.json');
-const messagesData = JSON.parse(rawData);
-
-app.use(cors())
-app.use(express.static('build'))
-app.use(express.static('pfp'))
-let users = []
 let model = null;
+const toxicity = require('@tensorflow-models/toxicity');
 toxicity.load(0.6).then(m => {
     model = m;
     console.log("Toxicity Model Loaded");
 });
 
+const fs = require('fs');
+const rawData = fs.readFileSync('messages.json');
+const messagesData = JSON.parse(rawData);
+let users = []
 
-socketIO.on('connection', (socket) => {
+const PORT = 4000
+const app = express()
+const http = require('http').Server(app);
+const cors = require("cors")
+app.use(cors())
+app.use(express.static('build'))
+app.use(express.static('pfp'))
+
+const url = process.env.NODE_ENV === 'production' ? "https://typological.me" : "http://localhost:3000"
+const io = require('socket.io')(http, {
+    cors: {
+        origin: url
+    }
+});
+
+io.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`)
 
     socket.on("message", async (data) => {
@@ -51,7 +51,7 @@ socketIO.on('connection', (socket) => {
                 console.error(err);
             }
         })
-        socketIO.emit("messageResponse", classifiedData)
+        io.emit("messageResponse", classifiedData)
     })
 
     socket.on("typing", data => {
@@ -61,13 +61,13 @@ socketIO.on('connection', (socket) => {
 
     socket.on("newUser", data => {
         users.push(data)
-        socketIO.emit("newUserResponse", users)
+        io.emit("newUserResponse", users)
     })
 
     socket.on('disconnect', () => {
         console.log('🔥: A user disconnected');
         users = users.filter(user => user.socketID !== socket.id)
-        socketIO.emit("newUserResponse", users)
+        io.emit("newUserResponse", users)
         socket.disconnect()
     });
 });
@@ -79,7 +79,6 @@ app.get('/api', (_, res) => {
 app.post('/profile', upload.any(), (_, res) => {
     res.status(200).send();
 });
-
 
 http.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
