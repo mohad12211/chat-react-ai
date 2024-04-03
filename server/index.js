@@ -98,11 +98,12 @@ app.post('/profile', upload.any(), async (req, res) => {
         fs.unlink(req.files[0].path, (err) => {
             if (err) {
                 console.error('Error deleting file:', err);
-                return;
             }
         });
+        res.status(400).json({ error: "NSFW image, Choose another one" });
+        return;
     }
-    res.status(200).send();
+    res.status(200).json({});
 });
 
 http.listen(PORT, () => {

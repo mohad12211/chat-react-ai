@@ -12,10 +12,15 @@ const Home = ({ socket }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         const formData = new FormData(e.target);
-        await fetch(url, {
+        const res = await fetch(url, {
             method: 'POST',
             body: formData
         });
+        const result = await res.json();
+        if (result.error) {
+            alert(result.error);
+            return;
+        }
         localStorage.setItem("userName", userName)
         socket.emit("newUser", { userName, socketID: socket.id })
         navigate("/chat")
