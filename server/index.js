@@ -1,5 +1,6 @@
 const express = require("express")
 const multer = require('multer')
+const fal = require("@fal-ai/serverless-client");
 const storage = multer.diskStorage({
     destination: function(_, _, cb) {
         cb(null, './pfp/')
@@ -76,7 +77,31 @@ app.get('/api', (_, res) => {
     res.json(messagesData);
 });
 
-app.post('/profile', upload.any(), (_, res) => {
+app.post('/profile', upload.any(), async (req, res) => {
+    console.log(req.files);
+    fal.config({
+        credentials: "54f4efc6-3806-46d2-b40d-039a4b51fcb4:ed1a4e2863f987d29f611c98924087aa",
+    });
+    const result = await fal.subscribe("fal-ai/imageutils/nsfw", {
+        input: {
+            image_url: `${url}/${req.files[0].filename}`
+            // image_url: `https://www.vikiswim.com/cdn/shop/files/VIKISWIM-DUA-BIKINI-BLACK-BROWNRINGS_2400x.jpg`
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+            if (update.status === "IN_PROGRESS") {
+                update.logs.map((log) => log.message).forEach(console.log);
+            }
+        },
+    });
+    if (result.nsfw_probability > 0.2) {
+        fs.unlink(req.files[0].path, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err);
+                return;
+            }
+        });
+    }
     res.status(200).send();
 });
 
